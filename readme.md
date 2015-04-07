@@ -15,11 +15,13 @@ $cake = new Cake;
 
 2 - You need a array to validate.
    The array should follow the following pattern:
+```
    key: <field-name>(|<field-name-alias>)
    value: array(
             key: <field-value>
             value: <field-rule>(|<field-rule>|<field-rule>(arguments)...)
         )
+```
 ```
 $fields = [
     'username'  => ['Yonas' => 'required|minlength(3)|maxlength(12)|alphanumeric'],
@@ -68,7 +70,7 @@ $items       => the given items that runs threw the Cake#validate() method
 | collection    | `list of values` (string)                 | ['service' => ['Google', 'collection(Google, Facebook, Twitter)']]                            | Checks if a value exists in the given collection.
 | date          | `date format` (string)                    | ['birthdate' => ['1.1.1990', 'date(d-m-Y)']]                                                  | Checks if the value is a valid date - based on the given date format. The method accepts every format that the DateTime#createFromFormat method accepts too.
 | email         | `none`                                    | ['emailadress' => ['test@example.com', 'email']]                                              | Checks if the value is a valid email address.
-| hexcolor      | `none`                                    | ['favouriteColor' => ['#FFFFFF', 'hexcolor']]                                                 | Checks if the value is a valid hex color.
+| hexcolor      | `none`                                    | ['favouriteColor' => ['#FFFFFF', 'date(d-m-Y)']]                                              | Checks if the value is a valid hex color.
 | match         | `list of fields` (string)                 | ['password' => ['test', 'match(repeatPassword)'], 'repeatPassword' => ['test', '']]           | Checks if the value matches to the other given fields.
 | ip            | `none`                                    | ['yourServer' => ['127.0.0.1', 'ip']]                                                         | Checks if the value is a valid ip address.
 | maxlength     | `maximum length` (integer)                | ['username' => ['Yonas', 'maxlength(12)']]                                                    | Checks the maximum length of the value.
