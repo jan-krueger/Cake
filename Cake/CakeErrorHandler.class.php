@@ -72,13 +72,22 @@ class CakeErrorHandler
             $message
         );
 
-        $this->errors[$field][$rule['name']] = $message;
+        $this->errors[$field][] = $message;
 
     }
 
     public function getErrors($field = null)
     {
-        return (is_null($field) ? $this->errors : $this->errors[$field]);
+
+        if(is_null($field)) {
+            return $this->errors;
+        }
+
+        if(array_key_exists($field, $this->errors)) {
+            return $this->errors[$field];
+        }
+
+        return null;
     }
 
     public function getLog()
@@ -86,9 +95,14 @@ class CakeErrorHandler
         return $this->log;
     }
 
-    public function valid()
+    public function passed()
     {
         return (count($this->getErrors()) === 0);
+    }
+
+    public function failed()
+    {
+        return (count($this->getErrors()) >= 1);
     }
 
 }

@@ -5,18 +5,27 @@ class Cake
 {
 
 
+    private $errorHandler;
+
     private $rules = [];
 
-    public function __construct()
+    private $items = [];
+
+    public function __construct(CakeErrorHandler $errorHandler)
     {
+        $this->errorHandler = $errorHandler;
         $this->loadRules();
     }
 
+    private function __autoload($class)
+    {
+        var_dump($class);
+    }
 
     public function validate($items)
     {
 
-        $errorHandler = new CakeErrorHandler;
+        $this->items = $items;
 
         foreach($items as $field => $arguments) {
 
@@ -24,7 +33,7 @@ class Cake
             $field = $fieldAlias[0];
 
             if(count($arguments) < 2) {
-                $errorHandler->log($field, "To less arguments. Please check the array for the field. The method expects two or more but only ". count($arguments) ." is given.");
+                $this->errorHandler->log($field, "To less arguments. Please check the array for the field. The method expects two or more but only ". count($arguments) ." is given.");
                 continue; //the given item has too less arguments to pass in
             }
 
@@ -39,9 +48,9 @@ class Cake
                 );
 
                 if($rule === null) { //the given rule doesnt exist
-                    if(!empty($ruleName))
-                        $errorHandler->log($field, "The given rule \"{$ruleName}\" doesn't exist.");
-
+                    if(!(empty($ruleName))) {
+                        $this->errorHandler->log($field, "The given rule \"{$ruleName}\" doesn't exist.");
+                    }
                     continue;
                 }
 
@@ -53,14 +62,13 @@ class Cake
                     $this,
                     $field,
                     $arguments[0],
-                    $ruleArguments,
-                    $items
+                    $ruleArguments
                 );
 
 
                 //when the validation fails then we add a message to the CakeErrorHandler
                 if(!($result)) {
-                    $errorHandler->addError(
+                    $this->errorHandler->addError(
                         $rule,
                         $field,
                         (count($fieldAlias) == 2 ? $fieldAlias[1] : null),
@@ -73,7 +81,7 @@ class Cake
 
         }
 
-        return $errorHandler;
+        return $this->errorHandler;
 
     }
 
@@ -102,7 +110,8 @@ class Cake
                 $name = mb_substr($rule, 6);
                 $method = new \ReflectionMethod($this, $rule);
 
-                if(!($method->getNumberOfParameters()) === 4) { //the method expects too much/less arguments
+                if(!($method->getNumberOfParameters()) === 3) { //the method expects too much/less arguments
+                    $this->errorHandler->log('methods', "The method \"{$name}\" expects ". $method->getNumberOfParameters() ." but it should expect 3 arguments.");
                     continue;
                 }
 
@@ -129,19 +138,24 @@ class Cake
     * 3) The rule must be "public"
     * 4) Done! - Now you can use your rule to validate fields.
     */
+    
+    public function rule__testit($field)
+    {
+        return false;
+    }
 
-    public function rule__alphanumeric($field, $value, $arguments, $items)
+    public function rule__alphanumeric($field, $value, $arguments)
     {
         return ctype_alnum($value);
     }
 
-    public function rule__collection($field, $value, $arguments, $items)
+    public function rule__collection($field, $value, $arguments)
     {
         return in_array($value, $arguments);
 
     }
 
-    public function rule__date($field, $value, $arguments, $items)
+    public function rule__date($field, $value, $arguments)
     {
 
         $date = \DateTime::createFromFormat($arguments, $value);
@@ -150,33 +164,33 @@ class Cake
         return ($date && ($date->format($arguments) == $value));
     }
 
-    public function rule__email($field, $value, $arguments, $items)
+    public function rule__email($field, $value, $arguments)
     {
         return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 
-    public function rule__hexcolor($field, $value, $arguments, $items)
+    public function rule__hexcolor($field, $value, $arguments)
     {
         return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/i', $value);
     }
 
-    public function rule__ip($field, $value, $arguments, $items)
+    public function rule__ip($field, $value, $arguments)
     {
         return filter_var($value, FILTER_VALIDATE_IP);
     }
 
-    public function rule__match($field, $value, $arguments, $items)
+    public function rule__match($field, $value, $arguments)
     {
 
         if(is_array($arguments)) {
 
             foreach($arguments as $argument) {
 
-                if(!(array_key_exists($argument, $items))) {
+                if(!(array_key_exists($argument, $this->items))) {
                     return false;
                 }
 
-                if(!($value === $items[$argument][0])) {
+                if(!($value === $this->items[$argument][0])) {
                     return false;
                 }
 
@@ -187,26 +201,26 @@ class Cake
         }
 
         //non array
-        if(!(array_key_exists($arguments, $items))) {
+        if(!(array_key_exists($arguments, $this->items))) {
             return false;
         }
 
-        return ($value === $items[$arguments][0]);
+        return ($value === $this->items[$arguments][0]);
     }
 
-    public function rule__maxlength($field, $value, $arguments, $items)
+    public function rule__maxlength($field, $value, $arguments)
     {
         return (mb_strlen($value) <= (int) $arguments);
     }
 
-    public function rule__minlength($field, $value, $arguments, $items)
+    public function rule__minlength($field, $value, $arguments)
     {
         return (mb_strlen($value) >= (int) $arguments);
     }
 
-    public function rule__nocatpcha($field, $value, $arguments, $items)
+    public function rule__nocatpcha($field, $value, $arguments)
     {
-        return static::getCurlResponse(
+        return CakeUtils::getCurlResponse(
             sprintf(
                 'https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s',
                 $arguments[0],
@@ -216,31 +230,14 @@ class Cake
         )['success'];
     }
 
-    public function rule__required($field, $value, $arguments, $items)
+    public function rule__required($field, $value, $arguments)
     {
         return (!(empty($value)));
     }
 
-    public function rule__url($field, $value, $arguments, $items)
+    public function rule__url($field, $value, $arguments)
     {
         return filter_var($value, FILTER_VALIDATE_URL);
-    }
-
-
-    private static function getCurlResponse($url)
-    {
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $url,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_RETURNTRANSFER => true
-        ]);
-
-        $result = curl_exec($curl);
-        return json_decode($result, true);
-
     }
 
 }

@@ -49,15 +49,14 @@ if($errorHandler->valid()) {
 # How can I add my own rules?
 
 1. Method Name: `rule__<your-rule-name>` | Replace the `<your-rule-name>` with your rule name
-2. Method Arguments: `rule__<your-rule-name>($field, $value, $arguments, $items)` | Your rule method needs four arguments.
+2. Method Arguments: `rule__<your-rule-name>($field, $value, $arguments)` | Your rule method needs three arguments.
 ```
 $field       => the field name
 $value       => the given value from the field
 $arguments   => the given arguments that are passed into the method
-$items       => the given items that runs threw the Cake#validate() method
 ```
 2.1) The names of the arguments doesn't matter
-3. The rule must be "public"
+3. The rule method must be "public"
 4. Done! - Now you can use your rule to validate fields.
 
 ---
