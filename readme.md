@@ -5,7 +5,7 @@ Cake is the latest validation project. Cake is based on "Validatio" and at all V
 
 ---
 
-# How can I use cake?
+# How can I use Cake?
 It's really simple to use.
 
 1 - First of all create a new instance that you can use to validate your fields
