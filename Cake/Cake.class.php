@@ -16,12 +16,7 @@ class Cake
         $this->errorHandler = $errorHandler;
         $this->loadRules();
     }
-
-    private function __autoload($class)
-    {
-        var_dump($class);
-    }
-
+    
     public function validate($items)
     {
 
