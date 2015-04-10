@@ -100,8 +100,13 @@ class Cake
 
     }
 
-    private function loadRules()
+    /**
+    * Call this method to load all rules
+    */
+    public function loadRules()
     {
+
+        $this->rules = [];
 
         foreach(get_class_methods($this) as $rule) {
 
@@ -126,19 +131,6 @@ class Cake
 
     }
 
-    /*
-    * This is the rules area.
-    * To add your own rule just create a new method that follows the following pattern:
-    * 1) Method Name: rule__<your-rule-name> | Replace the <your-rule-name> with your rule name
-    * 2) Method Arguments: rule__<your-rule-name>($field, $value, $arguments, $items) | Your rule method needs three arguments.
-    *       2.1) $field => the field name
-    *       2.1.2) $value => the given value from the field
-    *       2.1.3) $arguments => the given arguments that are passed into the method
-    *       2.2) The names of the arguments doesn't matter
-    * 3) The rule must be "public"
-    * 4) Done! - Now you can use your rule to validate fields.
-    */
-    
     public function rule__testit($field)
     {
         return false;
