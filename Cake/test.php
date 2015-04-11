@@ -14,7 +14,7 @@ if(isset($_POST['submitButton'])) {
         'username|Username' => [$_POST['username'], 'required|minlength(4)|maxlength(20)'],
         'email|E-Mail'      => [$_POST['email'], 'required|email'],
         'password|Password' => [$_POST['password'], 'required|minlength(6)|match(password_confirm)'],
-        'password_confirm' => [$_POST['password_confirm'], 'required']
+        'password_confirm|Confirm Password' => [$_POST['password_confirm'], 'required']
     ]);
 
     if($errorHandler->passed()) {

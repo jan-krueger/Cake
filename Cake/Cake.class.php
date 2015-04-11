@@ -16,11 +16,9 @@ class Cake
         $this->errorHandler = $errorHandler;
         $this->loadRules();
     }
-    
+
     public function validate($items)
     {
-
-        $this->items = $items;
 
         foreach($items as $field => $arguments) {
 
@@ -33,8 +31,28 @@ class Cake
             }
 
             $rules = explode('|', $arguments[1]);
+            $value = $arguments[0];
+            $alias = (count($fieldAlias) > 1 ? $fieldAlias[1] : null);
 
-            foreach($rules as $ruleName) {
+            $this->items[$field] = [
+                'name'  => $field,
+                'value' => $value,
+                'alias' => $alias,
+                'rules' => $rules
+            ];
+
+        }
+
+        $this->checkRules(); //no its going to valdiate and confirm each rule
+
+    }
+
+    private function checkRules()
+    {
+
+        foreach($this->items as $item) {
+
+            foreach($item['rules'] as $ruleName) {
 
                 preg_match("/\((.*?)\)/", $ruleName, $ruleArguments);
 
@@ -55,8 +73,8 @@ class Cake
                 //call rule to validate the input
                 $result = $rule['class']->invoke(
                     $this,
-                    $field,
-                    $arguments[0],
+                    $item['name'],
+                    $item['value'],
                     $ruleArguments
                 );
 
@@ -64,35 +82,21 @@ class Cake
                 //when the validation fails then we add a message to the CakeErrorHandler
                 if(!($result)) {
                     $this->errorHandler->addError(
+                        $this,
                         $rule,
-                        $field,
-                        (count($fieldAlias) == 2 ? $fieldAlias[1] : null),
-                        $arguments[0],
+                        $item,
                         $ruleArguments
                     );
                 }
 
             }
-
         }
-
-        return $this->errorHandler;
 
     }
 
-    private function getRuleByName($name)
+    public function getItems()
     {
-
-        foreach($this->rules as $rule) {
-
-            if($rule['name'] == $name) {
-                return $rule;
-            }
-
-        }
-
-        return null;
-
+        return $this->items;
     }
 
     /**
@@ -126,9 +130,19 @@ class Cake
 
     }
 
-    public function rule__testit($field)
+    private function getRuleByName($name)
     {
-        return false;
+
+        foreach($this->rules as $rule) {
+
+            if($rule['name'] == $name) {
+                return $rule;
+            }
+
+        }
+
+        return null;
+
     }
 
     public function rule__alphanumeric($field, $value, $arguments)
@@ -146,7 +160,6 @@ class Cake
     {
 
         $date = \DateTime::createFromFormat($arguments, $value);
-        var_dump($value);
 
         return ($date && ($date->format($arguments) == $value));
     }
@@ -177,7 +190,7 @@ class Cake
                     return false;
                 }
 
-                if(!($value === $this->items[$argument][0])) {
+                if(!($value === $this->items[$argument]['value'])) {
                     return false;
                 }
 
@@ -192,7 +205,7 @@ class Cake
             return false;
         }
 
-        return ($value === $this->items[$arguments][0]);
+        return ($value === $this->items[$arguments]['value']);
     }
 
     public function rule__maxlength($field, $value, $arguments)

@@ -48,11 +48,21 @@ class CakeErrorHandler
         $this->log[$field][] = $message;
     }
 
-    public function addError($rule, $field, $alias, $value, $arguments)
+    public function addError(Cake $cake, $rule, $item, $arguments)
     {
 
         if(!(array_key_exists($rule['name'], $this->messages))) {
             return;
+        }
+
+        //get values for the rule replacement
+        $ruleName = $rule['name'];
+        $field = (is_null($item['alias']) ? $item['name'] : $item['alias']);
+        $value = $item['value'];
+        $arguments = (count($arguments) > 1 ? join(', ', $arguments) : $arguments);
+
+        if(!(is_array($arguments)) && array_key_exists($arguments, $cake->getItems())) {
+            $arguments = $cake->getItems()[$arguments]['alias'];
         }
 
         $message = $this->messages[$rule['name']];
@@ -64,15 +74,15 @@ class CakeErrorHandler
                 '{arguments}'
             ],
             [
-                $rule['name'],
-                ($alias == null ? $field : $alias),
-                $value,
+                $ruleName,
+                $field,
+                $item['value'],
                 (count($arguments) > 1 ? join(', ', $arguments) : $arguments)
             ],
             $message
         );
 
-        $this->errors[$field][] = $message;
+        $this->errors[$item['name']][] = $message;
 
     }
 
