@@ -7,7 +7,7 @@ class CakeUtils
 
     private function __construct() {} //singelton
 
-    private static function getCurlResponse($url, $options = [CURLOPT_RETURNTRANSFER => true])
+    public static function getCurlResponse($url, $options = [CURLOPT_RETURNTRANSFER => true])
     {
 
         $curl = curl_init();
