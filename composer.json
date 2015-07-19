@@ -1,5 +1,5 @@
 {
-    "name": "sweetcode/Cake",
+    "name": "sweetcode/cake",
     "type": "library",
     "description": "PHP Data Validator",
     "keywords": ["validator","data"],
