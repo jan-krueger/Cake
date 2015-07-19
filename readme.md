@@ -5,6 +5,12 @@ Cake is the latest validation project. Cake is based on "Validatio" and at all V
 
 ---
 
+#Installation
+Just use Composer
+```
+composer require sweetcode/cake
+```
+
 # Bugs
 1. When you use aliases with the match rule it's doesn't work in the right way. #00001
 
