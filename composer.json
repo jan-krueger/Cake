@@ -4,7 +4,7 @@
     "description": "PHP Data Validator",
     "keywords": ["validator","data"],
     "homepage": "https://github.com/sweetcode/Cake",
-    "license": "MIT",
+    "version": "1.0.0-beta",
     "authors": [
         {
             "name": "Jan Krüger",
